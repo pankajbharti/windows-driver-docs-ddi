@@ -96,6 +96,8 @@ Typically, the driver does one of the following:
 <li>
 If the driver owns the I/O request, it calls <a href="https://msdn.microsoft.com/library/windows/hardware/ff550035">WdfRequestUnmarkCancelable</a> (if the request is cancelable)  and either calls <a href="https://msdn.microsoft.com/library/windows/hardware/ff550033">WdfRequestStopAcknowledge</a> with a <i>Requeue</i> value of TRUE, or it calls  <a href="https://msdn.microsoft.com/library/windows/hardware/ff549945">WdfRequestComplete</a> with a completion status value of STATUS_SUCCESS or STATUS_CANCELLED.
 
+WDF ensures that EvtIoStop does not race with the EvtIoxxx dispatch routine for that specific Request. In other words, WDF will wait for the EvtIoxxx dispatch routine for the Request to return, before calling EvtIoStop for that Request.  
+
 Before it can call <b>WdfRequest<i>Xxx</i></b> methods safely, the driver must make sure that its implementation of <i>EvtIoStop</i> has exclusive access to the request.   
 
 In order to do that, the driver must synchronize access to the request to prevent other threads from manipulating the request concurrently.  The synchronization method you choose will depend on your driver's design.
